@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.edu.unlar.programacion3.parcial1.exception.BateriaInsuficienteException;
@@ -22,28 +23,26 @@ public class EcorideController {
         this.ecorideService = ecorideService;
     }
 
-@PostMapping("/desbloquear")
-    public ResponseEntity<String> desbloquearVehiculo(@RequestBody DesbloqueoRequest request) {
-        try {
-            String resultado = ecorideService.procesarDesbloqueo(
-                request.getIdUsuario(),
-                request.getPatente(),
-                request.getMetodoPago()
-            );
-            return ResponseEntity.ok(resultado);
+@GetMapping("/desbloquear")
+public ResponseEntity<String> desbloquearVehiculo(
+        @RequestParam String idUsuario,
+        @RequestParam String patente,
+        @RequestParam String metodoPago) {
+    try {
+        String resultado = ecorideService.procesarDesbloqueo(idUsuario, patente, metodoPago);
+        return ResponseEntity.ok(resultado);
 
-        } catch (VehiculoNoEncontradoException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+    } catch (VehiculoNoEncontradoException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
 
-        } catch (BateriaInsuficienteException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Error: " + e.getMessage());
+    } catch (BateriaInsuficienteException e) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Error: " + e.getMessage());
 
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
 
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
-        }
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
     }
-    
+}
 }
